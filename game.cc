@@ -23,8 +23,8 @@ void transDistMap(const char **src, int **dest)
         {
             switch (src[i][j])
             {
-            case PRED:
-            case PREY:
+            case CHASER:
+            case FUGITIVE:
             case FREE:
                 dest[i][j] = 0;
             default:

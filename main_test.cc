@@ -21,8 +21,8 @@ int main(void)
         ifs >> world[i];
     }
 
-    //Prey((const char **)world, &action);
-    //Predator((const char **)world, &action);
+    //Chaser((const char **)world, &action);
+    //Fugitive((const char **)world, &action);
 
     cout << action << endl;
 

@@ -10,16 +10,16 @@
 int H, W;
 
 void printWorld(char **world);
-void threadPredator(char **world, struct Position pred, int *action);
-void threadPrey(char **world, struct Position prey, int *action);
+void threadChaser(char **world, struct Position chas, int *action);
+void threadFugitive(char **world, struct Position fugi, int *action);
 
 int main(int argc, char *argv[])
 {
     char **world;
     std::string filename = "world.dat";
-    struct Position prey, pred;
+    struct Position fugi, chas;
     int i, turn = 30;
-    int prey_action, pred_action;
+    int fugi_action, chas_action;
 
     for (i = 1; i < argc; i++)
     {
@@ -58,43 +58,43 @@ int main(int argc, char *argv[])
         ifs >> world[i];
     }
 
-    pred = getPosition((const char **)world, PRED);
-    prey = getPosition((const char **)world, PREY);
+    chas = getPosition((const char **)world, CHASER);
+    fugi = getPosition((const char **)world, FUGITIVE);
     for (i = 0; i < turn; i++)
     {
         system("clear");
         std::cout << "turn" << ':' << i + 1 << std::endl;
         printWorld(world);
 
-        std::thread th_prey(threadPrey, world, prey, &prey_action);
-        std::thread th_predator(threadPredator, world, pred, &pred_action);
+        std::thread th_fugi(threadFugitive, world, fugi, &fugi_action);
+        std::thread th_chasator(threadChaser, world, chas, &chas_action);
 
         usleep(WAITTIME);
 
-        th_predator.join();
-        th_prey.join();
+        th_chasator.join();
+        th_fugi.join();
 
-        world[pred.y][pred.x] = FREE;
-        world[prey.y][prey.x] = FREE;
-        if (pred_action != -1)
+        world[chas.y][chas.x] = FREE;
+        world[fugi.y][fugi.x] = FREE;
+        if (chas_action != -1)
         {
-            pred.y += dy[pred_action];
-            pred.x += dx[pred_action];
+            chas.y += dy[chas_action];
+            chas.x += dx[chas_action];
         }
-        if (prey_action != -1)
+        if (fugi_action != -1)
         {
 
-            prey.y += dy[prey_action];
-            prey.x += dx[prey_action];
+            fugi.y += dy[fugi_action];
+            fugi.x += dx[fugi_action];
         }
-        world[prey.y][prey.x] = PREY;
-        world[pred.y][pred.x] = PRED;
-        if (prey.y == pred.y && prey.x == pred.x)
+        world[fugi.y][fugi.x] = FUGITIVE;
+        world[chas.y][chas.x] = CHASER;
+        if (fugi.y == chas.y && fugi.x == chas.x)
         {
             system("clear");
             std::cout << "turn" << i + 1 << std::endl;
             printWorld(world);
-            std::cout << "Predator Win" << std::endl;
+            std::cout << "Chaser Win" << std::endl;
             for (i = 0; i < H; i++)
             {
                 delete world[i];
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     system("clear");
     std::cout << "turn" << i << std::endl;
     printWorld(world);
-    std::cout << "Prey Win" << std::endl;
+    std::cout << "Fugitive Win" << std::endl;
 
     for (i = 0; i < H; i++)
     {
@@ -131,17 +131,17 @@ void printWorld(char **world)
     }
 }
 
-void threadPredator(char **world, struct Position pred, int *action)
+void threadChaser(char **world, struct Position chas, int *action)
 {
     struct Position pos;
 
     *action = -1;
-    Predator((const char **)world, action);
+    Chaser((const char **)world, action);
 
     if (0 <= *action && *action <= 3)
     {
-        pos.y = pred.y + dy[*action];
-        pos.x = pred.x + dx[*action];
+        pos.y = chas.y + dy[*action];
+        pos.x = chas.x + dx[*action];
         if (isFree((const char **)world, pos))
         {
             return;
@@ -149,17 +149,17 @@ void threadPredator(char **world, struct Position pred, int *action)
     }
     *action = -1;
 }
-void threadPrey(char **world, struct Position prey, int *action)
+void threadFugitive(char **world, struct Position fugi, int *action)
 {
     struct Position pos;
 
     *action = -1;
-    Prey((const char **)world, action);
+    Fugitive((const char **)world, action);
 
     if (0 <= *action && *action <= 3)
     {
-        pos.y = prey.y + dy[*action];
-        pos.x = prey.x + dx[*action];
+        pos.y = fugi.y + dy[*action];
+        pos.x = fugi.x + dx[*action];
         if (isFree((const char **)world, pos))
         {
             return;
