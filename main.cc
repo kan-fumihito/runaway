@@ -3,11 +3,13 @@
 #include <unistd.h>
 #include <cstring>
 #include <fstream>
+#include <random>
 #include "game.hpp"
 
 #define WAITTIME 1000000
 
 int H, W;
+int prob=20;
 
 void printWorld(char **world);
 void threadChaser(char **world, struct Position chas, int *action);
@@ -46,6 +48,17 @@ int main(int argc, char *argv[])
             {
                 std::cout << "argument error" << std::endl;
             }
+        }else if (strcmp(argv[i], "-p") == 0)
+        {
+            if (argc >= i + 1)
+            {
+                prob = std::atoi(argv[i + 1]);
+                i++;
+            }
+            else
+            {
+                std::cout << "argument error" << std::endl;
+            }
         }
     }
 
@@ -63,7 +76,7 @@ int main(int argc, char *argv[])
     for (i = 0; i < turn; i++)
     {
         system("clear");
-        std::cout << "turn" << ':' << i + 1 << std::endl;
+        std::cout << "turn" << ':' << i << std::endl;
         printWorld(world);
 
         std::thread th_fugi(threadFugitive, world, fugi, &fugi_action);
@@ -153,17 +166,25 @@ void threadFugitive(char **world, struct Position fugi, int *action)
 {
     struct Position pos;
 
-    *action = -1;
-    Fugitive((const char **)world, action);
+    std::random_device rd;
+    std::default_random_engine eng(rd());
+    std::uniform_int_distribution<int> distr(1, 100);
+    int n = distr(eng);
 
-    if (0 <= *action && *action <= 3)
-    {
-        pos.y = fugi.y + dy[*action];
-        pos.x = fugi.x + dx[*action];
-        if (isFree((const char **)world, pos))
-        {
-            return;
-        }
-    }
     *action = -1;
+    if (n > prob)
+    {
+        Fugitive((const char **)world, action);
+
+        if (0 <= *action && *action <= 3)
+        {
+            pos.y = fugi.y + dy[*action];
+            pos.x = fugi.x + dx[*action];
+            if (isFree((const char **)world, pos))
+            {
+                return;
+            }
+        }
+        *action = -1;
+    }
 }
