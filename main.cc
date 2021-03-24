@@ -80,11 +80,11 @@ int main(int argc, char *argv[])
         printWorld(world);
 
         std::thread th_fugi(threadFugitive, world, fugi, &fugi_action);
-        std::thread th_chasator(threadChaser, world, chas, &chas_action);
+        std::thread th_chas(threadChaser, world, chas, &chas_action);
 
         usleep(WAITTIME);
 
-        th_chasator.join();
+        th_chas.join();
         th_fugi.join();
 
         world[chas.y][chas.x] = FREE;
