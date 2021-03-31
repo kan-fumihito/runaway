@@ -1,3 +1,5 @@
+#ifndef GAME_HH
+#define GAME_HH
 
 #define WALL '#'
 #define FREE '.'
@@ -18,3 +20,5 @@ bool isFree(const char **world, struct Position pos);
 
 void Chaser(const char **world, int *action);
 void Fugitive(const char **world, int *action);
+
+#endif // !GAME_HH
